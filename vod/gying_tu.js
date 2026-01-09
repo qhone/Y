@@ -10,7 +10,7 @@ let $config = argsify($config_str)
 const appConfig = {
     ver: 1,
     title: '观影',
-    site: $config?.site || "https://www.gying.net/",
+    site: $config?.site||"https://www.gying.net/",
     tabs: [
         {
             name: '热门电影',
@@ -52,7 +52,7 @@ const appConfig = {
     ],
 }
 async function getConfig() {
-    if ($config.cookie == "" || $config.cookie == undefined) {
+    if($config.cookie=="" || $config.cookie == undefined){
         $utils.toastError('cookie未配置！')
         return
     }
@@ -64,17 +64,17 @@ async function getCards(ext) {
     let cards = []
     let { page = 1, id } = ext
     let url;
-    if (ext.id.includes("hits")) {
-        if (page > 1) { return }
-        url = `${appConfig.site}${id}`
-    } else {
-        url = `${appConfig.site}${id}${page}`
+    if(ext.id.includes("hits")){
+        if(page>1){return}
+        url=`${appConfig.site}${id}`
+    }else{
+        url=`${appConfig.site}${id}${page}`
     }
     //$utils.toastError(url);
     const { data } = await $fetch.get(url, {
         headers: {
             "User-Agent": UA,
-            "Cookie": $config.cookie
+            "Cookie":$config.cookie
         },
     });
     const $ = cheerio.load(data)
@@ -100,12 +100,12 @@ async function getCards(ext) {
 
         const inlistData = JSON.parse(inlistMatch[1]);
 
-        inlistData["i"].forEach((item, index) => {
+        inlistData["i"].forEach((item,index)=>{
 
             cards.push({
                 vod_id: item,
                 vod_name: inlistData["t"][index],
-                 vod_pic: `https://s.tutu.pm/img/${inlistData["ty"]}/${item}/384.webp`，
+                vod_pic: `https://s.tutu.pm/img/${inlistData["ty"]}/${item}/384.webp`,
                 vod_remarks: inlistData["g"][index],
                 ext: {
                     url: `${appConfig.site}res/downurl/${inlistData["ty"]}/${item}`,
@@ -127,12 +127,12 @@ async function getTracks(ext) {
     const { data } = await $fetch.get(url, {
         headers: {
             'User-Agent': UA,
-            "Cookie": $config.cookie
+            "Cookie":$config.cookie
         },
     })
-    const respstr = parseJsonIfString(data)
+    const respstr =parseJsonIfString(data)
     //清洗的结果
-    if (respstr.hasOwnProperty('panlist')) {
+    if(respstr.hasOwnProperty('panlist')){
         const patterns = {
             resolution: /(4K|4k|1080P|1080p)/,
             hdr: /(HDR)/,
@@ -151,7 +151,7 @@ async function getTracks(ext) {
                 }
                 const domain = match[2].toLowerCase();
                 const hit = keys.find(k => domain.includes(k));
-                if (!hit) {
+                if(!hit){
                     return;
                 }
             }
@@ -166,7 +166,7 @@ async function getTracks(ext) {
             let title = tags.length ? tags.join('/') : '未知规格';
 
             tracks.push({
-                name: title + `（${(index + 1).toString()}）`,
+                name:title+`（${(index+1).toString()}）`,
                 pan: item,
                 ext: {
                     url: '',
@@ -174,7 +174,7 @@ async function getTracks(ext) {
             })
         });
         const hostCount = {};
-        const order = ["189.cn", "quark.cn", "115cdn"];
+        const order = ["quark.cn", "alipan.com", "uc.cn", "189.cn", "115cdn"];
         tracks = tracks.sort((a, b) => {
             const ma = a.pan.match(/^https?:\/\/([^\/?#]+)/i);
             const mb = b.pan.match(/^https?:\/\/([^\/?#]+)/i);
@@ -198,16 +198,16 @@ async function getTracks(ext) {
 
             hostCount[host] = (hostCount[host] || 0) + 1;
 
-            return hostCount[host] <= 10;
+            return hostCount[host] <=10;
         });
 
 
-        //${respstr.panlist.tname[respstr.panlist.type[index]]}
+//${respstr.panlist.tname[respstr.panlist.type[index]]}
 
-    } else if (respstr.hasOwnProperty('file')) {
+    }else if(respstr.hasOwnProperty('file')){
 
         $utils.toastError('网盘验证掉签请前往主站完成验证数字')
-    } else {
+    }else{
 
         $utils.toastError('没有网盘资源');
 
@@ -238,18 +238,18 @@ async function search(ext) {
     const { data } = await $fetch.get(url, {
         headers: {
             "User-Agent": UA,
-            "Cookie": $config.cookie
+            "Cookie":$config.cookie
         },
     })
 
     let cards = [];
-    const result = JSON.parse(data.match(/_obj\.search\s*=\s*(\{[\s\S]*?\});/)[1]);
+    const result=JSON.parse(data.match(/_obj\.search\s*=\s*(\{[\s\S]*?\});/)[1]);
     result.l.title.forEach((item, index) => {
         cards.push({
             vod_id: result.l.i[index],
             vod_name: item,
             vod_pic: `https://s.tutu.pm/img/${result.l.d[index]}/${result.l.i[index]}/256.webp`,
-            vod_remarks: "豆瓣 " + result.l.pf.db.s[index],
+            vod_remarks: "豆瓣 "+result.l.pf.db.s[index],
             ext: {
                 url: `${appConfig.site}/res/downurl/${result.l.d[index]}/${result.l.i[index]}`,
             },
