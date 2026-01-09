@@ -105,7 +105,7 @@ async function getCards(ext) {
             cards.push({
                 vod_id: item,
                 vod_name: inlistData["t"][index],
-                vod_pic: `https://s.tutu.pm/img/${inlistData["ty"]}/${item}.webp`,
+                 vod_pic: `https://s.tutu.pm/img/${inlistData["ty"]}/${item}/384.webp`，
                 vod_remarks: inlistData["g"][index],
                 ext: {
                     url: `${appConfig.site}res/downurl/${inlistData["ty"]}/${item}`,
